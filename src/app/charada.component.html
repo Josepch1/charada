@@ -6,13 +6,18 @@
 
   <div class="main-input">
     <div class="try-container" *ngFor="let try of tries">
-      <div class="letter-container" *ngFor="let letter of try.letters">
-        a
+      <div class="letter-container" *ngFor="let letter of try.letters"
+          [class.has-text] = "letter.text !== ''">
+        {{letter.text}}
       </div>
     </div>
   </div>
 
   <div class="teclado-container">
     teclado
+  </div>
+
+  <div class="msg" [class.show] = "msg !== ''" [class.fade-out] = "fadeOutInfoMsg">
+    {{msg}}
   </div>
 </div>

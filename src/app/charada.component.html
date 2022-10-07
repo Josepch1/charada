@@ -14,10 +14,10 @@
   </div>
 
   <div class="teclado-container">
-    teclado
-  </div>
-
-  <div class="msg" [class.show] = "msg !== ''" [class.fade-out] = "fadeOutInfoMsg">
-    {{msg}}
+    <div [class]="['row' + i, 'row'].join(' ')" *ngFor="let row of keyboardRows; let i = index">
+      <div [class]="'key'" *ngFor="let key of row">
+        {{key}}
+      </div>
+    </div>
   </div>
 </div>

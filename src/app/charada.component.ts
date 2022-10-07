@@ -1,5 +1,4 @@
 import { Component, HostListener } from '@angular/core';
-import { timeout } from 'rxjs';
 import { WORDS } from './wordlist';
 
 const wordLenght = 5;
@@ -37,14 +36,23 @@ enum LetterState {
 export class Charada {
   readonly tries: Try[] = [];
 
-  msg = '';
-  fadeOutInfoMsg = false;
-
   private palavraCerta = '';
 
   private currentLetterIndex = 0;
 
   private submittedTries = 0;
+
+  readonly keyboardRows = [
+    ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
+    ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
+    ['Enter', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'Backspace'],
+  ];
+
+  message = 'Oi'
+  fadeOutMessage = false;
+
+  readonly curLetterStates: {[key: string]: LetterState} = {};
+  
 
   constructor(){
     for(let i = 0; i < tries; i++){
@@ -87,38 +95,43 @@ export class Charada {
     }
     else if(key === 'Enter'){
       this.checkTry();
-
-  }
-  }
-
-  private checkTry() {
-    const currentTryIndex = this.tries[this.submittedTries];
-    if (currentTryIndex.letters.some(letter => letter.text === '')) {
-      return;
     }
-    ///const palavraUsadaCurrentTry = currentTryIndex.letters.map(letter => letter.text).join('').toUpperCase;
-    ///if(!WORDS.includes(palavraUsadaCurrentTry)){
-    ///  return;
-    ///}
   }
-
-  private showMsg(msg: string) {
-    this.msg = msg;
-
-    setTimeout(() => {
-      this.fadeOutInfoMsg = true;
-      setTimeout(() => {
-        this.msg = '';
-        this.fadeOutInfoMsg = false;
-      }, 500);
-    }, 3000);
-  }
-
+  
   private setLetter(letter: string){
     const indexTry = Math.floor(this.currentLetterIndex / wordLenght);
     const indexLetter = this.currentLetterIndex - indexTry * wordLenght;
     this.tries[indexTry].letters[indexLetter].text = letter;
   }
 
+  private checkTry() {
+    const currentTryIndex = this.tries[this.submittedTries];
+    if (currentTryIndex.letters.some(letter => letter.text === '')) {
+      this.message = 'Digite uma palavra de 5 letras'
+      console.log('Digite uma palavra de 5 letras')
+      return;
+    }
+
+    const wordFromCurTry = currentTryIndex.letters.map(letter => letter.text).join('').toUpperCase();
+    if (!WORDS.includes(wordFromCurTry)) {
+      this.message = 'Nao é uma palavra da lista'
+      console.log('Nao é uma palavra da lista')
+      return;
+    }
+  }
+
+  public showMessage(message: string){
+    this.message = message
+    
+      setTimeout(() => {
+        this.fadeOutMessage = true
+        setTimeout(() => {
+          this.message = ''
+          this.fadeOutMessage = false
+        }, 500)
+      }, 2000);
+    }
+  
+  
 
 }

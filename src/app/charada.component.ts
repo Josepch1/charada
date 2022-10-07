@@ -1,4 +1,4 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, ViewChildren, QueryList, ElementRef } from '@angular/core';
 import { WORDS } from './wordlist';
 
 const wordLenght = 5;
@@ -34,9 +34,13 @@ enum LetterState {
   styleUrls: ['./charada.component.css'],
 })
 export class Charada {
+  @ViewChildren('tryContainer') tryContainers!: QueryList<ElementRef>;
+
   readonly tries: Try[] = [];
 
   private palavraCerta = '';
+
+  private targetWordLetterCounts: {[letter: string]: number} = {}
 
   private currentLetterIndex = 0;
 
@@ -104,7 +108,7 @@ export class Charada {
     this.tries[indexTry].letters[indexLetter].text = letter;
   }
 
-  private checkTry() {
+  private async checkTry() {
     const currentTryIndex = this.tries[this.submittedTries];
     if (currentTryIndex.letters.some(letter => letter.text === '')) {
       this.message = 'Digite uma palavra de 5 letras'
@@ -112,11 +116,43 @@ export class Charada {
       return;
     }
 
-    const wordFromCurTry = currentTryIndex.letters.map(letter => letter.text).join('').toUpperCase();
-    if (!WORDS.includes(wordFromCurTry)) {
+    if (!WORDS.includes(currentTryIndex.letters.map(letter => letter.text).join(''))) {
       this.message = 'Nao é uma palavra da lista'
-      console.log('Nao é uma palavra da lista')
+      console.log(this.message);
       return;
+    }
+
+    const states: LetterState[] = [];
+    for (let i = 0; i < wordLenght; i++) {
+      const expected = this.palavraCerta[i];
+      const curLetter = currentTryIndex.letters[i];
+      const got = curLetter.text.toLowerCase();
+      let state = LetterState.WRONG;
+
+      if (expected === got) {
+        state = LetterState.FULL_MATCH;
+      } else if (
+          this.palavraCerta.includes(got)) {
+        state = LetterState.PARTIAL_MATCH;
+      }
+      states.push(state);
+    }
+    console.log(states);
+    
+    const tryContainer = this.tryContainers.get(this.submittedTries)?.nativeElement as HTMLElement;
+
+    const letterEles = tryContainer.querySelector('.letter-container')
+
+    for(let i = 0; i < letterEles.length; i++){
+      const curLetterEle = letterEles[i];
+      curLetterEle.classList.add('fold');
+      // Wait for the fold animation to finish.
+      await this.wait(180);
+      // Update state. This will also update styles.
+      currentTryIndex.letters[i].state = states[i];
+      // Unfold.
+      curLetterEle.classList.remove('fold');
+      await this.wait(180);
     }
   }
 
@@ -132,6 +168,12 @@ export class Charada {
       }, 2000);
     }
   
-  
+    private async wait(ms: number) {
+      await new Promise<void>((resolve) => {
+        setTimeout(() => {
+          resolve();
+        }, ms);
+      })
+    }
 
 }

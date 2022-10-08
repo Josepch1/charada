@@ -1,11 +1,17 @@
-import { Component, HostListener, ViewChildren, QueryList, ElementRef } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  ViewChildren,
+  QueryList,
+  ElementRef,
+} from '@angular/core';
 import { WORDS } from './wordlist';
 
 const wordLenght = 5;
 const tries = 6;
 
 const letters = (() => {
-  const ret: {[key: string]: boolean} = {};
+  const ret: { [key: string]: boolean } = {};
   for (let charCode = 97; charCode < 97 + 26; charCode++) {
     ret[String.fromCharCode(charCode)] = true;
   }
@@ -40,9 +46,11 @@ export class Charada {
 
   private palavraCerta = '';
 
-  private targetWordLetterCounts: {[letter: string]: number} = {}
+  private targetWordLetterCounts: { [letter: string]: number } = {};
 
   private currentLetterIndex = 0;
+
+  readonly LetterState = LetterState;
 
   private submittedTries = 0;
 
@@ -52,27 +60,31 @@ export class Charada {
     ['Enter', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'Backspace'],
   ];
 
-  message = 'Oi'
+  message = '';
   fadeOutMessage = false;
 
-  readonly curLetterStates: {[key: string]: LetterState} = {};
-  
+  showShareDialogContainer = false;
+  showShareDialog = false;
 
-  constructor(){
-    for(let i = 0; i < tries; i++){
+  readonly curLetterStates: { [key: string]: LetterState } = {};
+
+  private ganhou = false;
+
+  constructor() {
+    for (let i = 0; i < tries; i++) {
       const letters: Letters[] = [];
-      for(let j = 0; j < wordLenght; j++){
-        letters.push({text: '', state: LetterState.PENDING})
+      for (let j = 0; j < wordLenght; j++) {
+        letters.push({ text: '', state: LetterState.PENDING });
       }
-      this.tries.push({letters})
+      this.tries.push({ letters });
     }
 
     const numeroPalavras = WORDS.length;
-    while(true) {
+    while (true) {
       const index = Math.floor(Math.random() * numeroPalavras);
       const word = WORDS[index];
 
-      if(word.length === wordLenght) {
+      if (word.length === wordLenght) {
         this.palavraCerta = word.toLowerCase();
         break;
       }
@@ -84,25 +96,71 @@ export class Charada {
     this.handleClickKey(event.key);
   }
 
+  getKeyClass(key: string): string {
+    const state = this.curLetterStates[key.toLowerCase()];
+    switch (state) {
+      case LetterState.FULL_MATCH:
+        return '100%';
+      case LetterState.PARTIAL_MATCH:
+        return '50%';
+      case LetterState.WRONG:
+        return '0%';
+      default:
+        return 'key';
+    }
+  }
+
   private handleClickKey(key: string) {
-    if(letters[key.toLowerCase()]) {
-      if(this.currentLetterIndex < (this.submittedTries + 1) * wordLenght){
+    if (this.ganhou) {
+      return;
+    }
+    if (letters[key.toLowerCase()]) {
+      if (this.currentLetterIndex < (this.submittedTries + 1) * wordLenght) {
         this.setLetter(key);
         this.currentLetterIndex++;
       }
-    }
-    else if(key === 'Backspace'){
-      if (this.currentLetterIndex > this.submittedTries * wordLenght){
+    } else if (key === 'Backspace') {
+      if (this.currentLetterIndex > this.submittedTries * wordLenght) {
         this.currentLetterIndex--;
         this.setLetter('');
       }
-    }
-    else if(key === 'Enter'){
+    } else if (key === 'Enter') {
       this.checkTry();
     }
   }
-  
-  private setLetter(letter: string){
+
+  handleClickShare() {
+    // 🟩🟨⬜
+    // Copy results into clipboard.
+    let clipboardContent = '';
+    for (let i = 0; i < this.submittedTries; i++) {
+      for (let j = 0; j < wordLenght; j++) {
+        const letter = this.tries[i].letters[j];
+        switch (letter.state) {
+          case LetterState.FULL_MATCH:
+            clipboardContent += '🟩';
+            break;
+          case LetterState.PARTIAL_MATCH:
+            clipboardContent += '🟨';
+            break;
+          case LetterState.WRONG:
+            clipboardContent += '⬜';
+            break;
+          default:
+            break;
+        }
+      }
+      clipboardContent += '\n';
+    }
+    console.log(clipboardContent);
+    navigator.clipboard.writeText(clipboardContent);
+    this.showShareDialogContainer = false;
+    this.showShareDialog = false;
+    this.message = 'Resultado copiado!';
+    console.log(this.message);
+  }
+
+  private setLetter(letter: string) {
     const indexTry = Math.floor(this.currentLetterIndex / wordLenght);
     const indexLetter = this.currentLetterIndex - indexTry * wordLenght;
     this.tries[indexTry].letters[indexLetter].text = letter;
@@ -110,18 +168,21 @@ export class Charada {
 
   private async checkTry() {
     const currentTryIndex = this.tries[this.submittedTries];
-    if (currentTryIndex.letters.some(letter => letter.text === '')) {
-      this.message = 'Digite uma palavra de 5 letras'
-      console.log('Digite uma palavra de 5 letras')
-      return;
-    }
-
-    if (!WORDS.includes(currentTryIndex.letters.map(letter => letter.text).join(''))) {
-      this.message = 'Nao é uma palavra da lista'
+    if (currentTryIndex.letters.some((letter) => letter.text === '')) {
+      this.message = 'Digite uma palavra de 5 letras';
       console.log(this.message);
       return;
     }
 
+    if (
+      !WORDS.includes(
+        currentTryIndex.letters.map((letter) => letter.text).join('')
+      )
+    ) {
+      this.message = 'Nao é uma palavra da lista';
+      console.log(this.message);
+      return;
+    }
     const states: LetterState[] = [];
     for (let i = 0; i < wordLenght; i++) {
       const expected = this.palavraCerta[i];
@@ -131,49 +192,83 @@ export class Charada {
 
       if (expected === got) {
         state = LetterState.FULL_MATCH;
-      } else if (
-          this.palavraCerta.includes(got)) {
+      } else if (this.palavraCerta.includes(got)) {
         state = LetterState.PARTIAL_MATCH;
       }
       states.push(state);
     }
     console.log(states);
-    
-    const tryContainer = this.tryContainers.get(this.submittedTries)?.nativeElement as HTMLElement;
 
-    const letterEles = tryContainer.querySelector('.letter-container')
-
-    for(let i = 0; i < letterEles.length; i++){
+    const tryContainer = this.tryContainers.get(this.submittedTries)
+      ?.nativeElement as HTMLElement;
+    const letterEles = tryContainer.querySelectorAll('.letter-container');
+    for (let i = 0; i < letterEles.length; i++) {
       const curLetterEle = letterEles[i];
       curLetterEle.classList.add('fold');
-      // Wait for the fold animation to finish.
-      await this.wait(180);
-      // Update state. This will also update styles.
       currentTryIndex.letters[i].state = states[i];
-      // Unfold.
       curLetterEle.classList.remove('fold');
-      await this.wait(180);
+    }
+
+    for (let i = 0; i < wordLenght; i++) {
+      const curLetter = currentTryIndex.letters[i];
+      const got = curLetter.text.toLowerCase();
+      const curStoredState = this.curLetterStates[got];
+      const targetState = states[i];
+      // This allows override state with better result.
+      //
+      // For example, if "A" was partial match in previous try, and becomes full
+      // match in the current try, we update the key state to the full match
+      // (because its enum value is larger).
+      if (curStoredState == null || targetState > curStoredState) {
+        this.curLetterStates[got] = targetState;
+      }
+    }
+
+    this.submittedTries++;
+
+    if (states.every((state) => state === LetterState.FULL_MATCH)) {
+      this.message = 'Nice';
+      console.log(this.message);
+      this.ganhou = true;
+      this.showShare();
+      return;
+    }
+
+    if (this.submittedTries === tries) {
+      // Don't hide it.
+      this.showMessage(this.palavraCerta.toUpperCase(), false);
+      this.showShare();
     }
   }
 
-  public showMessage(message: string){
-    this.message = message
-    
+  public showMessage(message: string, hide = true) {
+    this.message = message;
+
+    if (hide) {
       setTimeout(() => {
-        this.fadeOutMessage = true
+        this.fadeOutMessage = true;
         setTimeout(() => {
-          this.message = ''
-          this.fadeOutMessage = false
-        }, 500)
+          this.message = '';
+          this.fadeOutMessage = false;
+        }, 500);
       }, 2000);
     }
-  
-    private async wait(ms: number) {
-      await new Promise<void>((resolve) => {
-        setTimeout(() => {
-          resolve();
-        }, ms);
-      })
-    }
+  }
 
+  private async wait(ms: number) {
+    await new Promise<void>((resolve) => {
+      setTimeout(() => {
+        resolve();
+      }, ms);
+    });
+  }
+
+  private showShare() {
+    setTimeout(() => {
+      this.showShareDialogContainer = true;
+      setTimeout(() => {
+        this.showShareDialog = true;
+      });
+    }, 1500);
+  }
 }

@@ -19,17 +19,7 @@
   <div class="teclado-container">
     <div [class]="['row' + i, 'row'].join(' ')" *ngFor="let row of keyboardRows; let i = index">
       <div [class]="'key'" *ngFor="let key of row" [class]="getKeyClass(key)" [class.enter]="key === 'Enter'" (click)="handleClickKey(key)">
-        <div *ngIf="key !== 'Backspace'; else backspace">
-            <div *ngIf="key !== 'Enter'; else enter">
-              {{key}}
-            </div>
-        </div>
-        <ng-template #backspace>
-          <img src="../assets/backspace.png" />
-        </ng-template>
-        <ng-template #enter>
-          <img src="../assets/enter.png" />
-        </ng-template>
+        {{key}}
       </div>
     </div>
   </div>

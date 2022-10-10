@@ -81,7 +81,7 @@ export class Charada {
       const word = WORDS[index];
 
       if (word.length === wordLenght) {
-        this.palavraCerta = word.toLowerCase();
+        this.palavraCerta = word.replace(/[^a-zA-Z ]/g, "").toLowerCase()
         break;
       }
     }
@@ -104,6 +104,10 @@ export class Charada {
       default:
         return 'key';
     }
+  }
+
+  removerSpecials(str: string) {
+    return str.normalize("NFD").replace(/[^a-zA-Z\s]/g, "");
   }
 
   public handleClickKey(key: string) {

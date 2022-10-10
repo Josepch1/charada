@@ -212,12 +212,4 @@ export class Charada {
       }, 2000);
     }
   }
-
-  private async wait(ms: number) {
-    await new Promise<void>((resolve) => {
-      setTimeout(() => {
-        resolve();
-      }, ms);
-    });
-  }
 }

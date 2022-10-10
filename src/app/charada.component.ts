@@ -112,7 +112,7 @@ export class Charada {
     }
     if (letters[key.toLowerCase()]) {
       if (this.currentLetterIndex < (this.submittedTries + 1) * wordLenght) {
-        this.setLetter(key);
+        this.setLetter(key.toLowerCase());
         this.currentLetterIndex++;
       }
     } else if (key === 'Backspace') {
@@ -138,12 +138,8 @@ export class Charada {
       console.log(this.message);
       return;
     }
-
-    if (
-      !WORDS.includes(
-        currentTryIndex.letters.map((letter) => letter.text).join('')
-      )
-    ) {
+    const wordFromCurTry = currentTryIndex.letters.map(letter => letter.text).join('');
+    if (!WORDS.includes(wordFromCurTry)) {
       this.message = 'Nao é uma palavra da lista';
       console.log(this.message);
       return;

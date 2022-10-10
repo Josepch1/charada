@@ -5,6 +5,7 @@ import {
   QueryList,
   ElementRef,
 } from '@angular/core';
+
 import { WORDS } from './wordlist';
 
 const wordLenght = 5;
@@ -46,8 +47,6 @@ export class Charada {
 
   private palavraCerta = '';
 
-  private targetWordLetterCounts: { [letter: string]: number } = {};
-
   private currentLetterIndex = 0;
 
   readonly LetterState = LetterState;
@@ -62,9 +61,6 @@ export class Charada {
 
   message = '';
   fadeOutMessage = false;
-
-  showShareDialogContainer = false;
-  showShareDialog = false;
 
   readonly curLetterStates: { [key: string]: LetterState } = {};
 
@@ -100,17 +96,17 @@ export class Charada {
     const state = this.curLetterStates[key.toLowerCase()];
     switch (state) {
       case LetterState.FULL_MATCH:
-        return '100%';
+        return 'certo';
       case LetterState.PARTIAL_MATCH:
-        return '50%';
+        return 'meio-certo';
       case LetterState.WRONG:
-        return '0%';
+        return 'errado';
       default:
         return 'key';
     }
   }
 
-  private handleClickKey(key: string) {
+  public handleClickKey(key: string) {
     if (this.ganhou) {
       return;
     }
@@ -127,37 +123,6 @@ export class Charada {
     } else if (key === 'Enter') {
       this.checkTry();
     }
-  }
-
-  handleClickShare() {
-    // 🟩🟨⬜
-    // Copy results into clipboard.
-    let clipboardContent = '';
-    for (let i = 0; i < this.submittedTries; i++) {
-      for (let j = 0; j < wordLenght; j++) {
-        const letter = this.tries[i].letters[j];
-        switch (letter.state) {
-          case LetterState.FULL_MATCH:
-            clipboardContent += '🟩';
-            break;
-          case LetterState.PARTIAL_MATCH:
-            clipboardContent += '🟨';
-            break;
-          case LetterState.WRONG:
-            clipboardContent += '⬜';
-            break;
-          default:
-            break;
-        }
-      }
-      clipboardContent += '\n';
-    }
-    console.log(clipboardContent);
-    navigator.clipboard.writeText(clipboardContent);
-    this.showShareDialogContainer = false;
-    this.showShareDialog = false;
-    this.message = 'Resultado copiado!';
-    console.log(this.message);
   }
 
   private setLetter(letter: string) {
@@ -214,11 +179,6 @@ export class Charada {
       const got = curLetter.text.toLowerCase();
       const curStoredState = this.curLetterStates[got];
       const targetState = states[i];
-      // This allows override state with better result.
-      //
-      // For example, if "A" was partial match in previous try, and becomes full
-      // match in the current try, we update the key state to the full match
-      // (because its enum value is larger).
       if (curStoredState == null || targetState > curStoredState) {
         this.curLetterStates[got] = targetState;
       }
@@ -230,14 +190,12 @@ export class Charada {
       this.message = 'Nice';
       console.log(this.message);
       this.ganhou = true;
-      this.showShare();
+
       return;
     }
 
     if (this.submittedTries === tries) {
-      // Don't hide it.
       this.showMessage(this.palavraCerta.toUpperCase(), false);
-      this.showShare();
     }
   }
 
@@ -261,14 +219,5 @@ export class Charada {
         resolve();
       }, ms);
     });
-  }
-
-  private showShare() {
-    setTimeout(() => {
-      this.showShareDialogContainer = true;
-      setTimeout(() => {
-        this.showShareDialog = true;
-      });
-    }, 1500);
   }
 }

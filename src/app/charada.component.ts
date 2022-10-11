@@ -138,14 +138,12 @@ export class Charada {
   private async checkTry() {
     const currentTryIndex = this.tries[this.submittedTries];
     if (currentTryIndex.letters.some((letter) => letter.text === '')) {
-      this.message = 'Digite uma palavra de 5 letras';
-      console.log(this.message);
+      this.showMessage("Digite uma palavra de 5 letras")
       return;
     }
     const wordFromCurTry = currentTryIndex.letters.map(letter => letter.text).join('');
     if (!WORDS.includes(wordFromCurTry)) {
-      this.message = 'Nao é uma palavra da lista';
-      console.log(this.message);
+      this.showMessage("A palavra inserida nao está na lista")
       return;
     }
     const states: LetterState[] = [];
@@ -187,8 +185,7 @@ export class Charada {
     this.submittedTries++;
 
     if (states.every((state) => state === LetterState.FULL_MATCH)) {
-      this.message = 'Nice';
-      console.log(this.message);
+      this.showMessage('Nice')
       this.ganhou = true;
 
       return;

@@ -171,11 +171,11 @@
 	opacity: 0;
 }
 
-.message > .show {
+.show {
   opacity: 1;
 }
 
-.message > .fade-out{
+.fade-out{
   opacity: 0;
   transition: opacity 500ms;
 }

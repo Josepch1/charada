@@ -52,19 +52,6 @@ ng build --prod
 ```
 The build artifacts will be stored in the `dist/` directory.
 
-## Contributing
-
-We welcome contributions! Please read our [Contributing Guidelines](CONTRIBUTING.md) for more details.
-
-## License
-
-This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for details.
-
-## Acknowledgements
-
-- Thanks to the contributors and the open-source community. 🙏
-- Special thanks to [Angular](https://angular.io/) for their amazing framework.
-
 ---
 
 Feel free to reach out if you have any questions or suggestions! 😊

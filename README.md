@@ -1,27 +1,70 @@
-# Charada
+# Charada Project
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 14.2.1.
+Welcome to the **Charada Project**! 🎉
 
-## Development server
+## Overview
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+The Charada Project is an Angular application designed to provide an exceptional user experience. This project is built with modern web technologies and follows best practices to ensure high performance and maintainability.
 
-## Code scaffolding
+## Features
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+- 🚀 **High Performance**: Optimized for speed and efficiency.
+- 🎨 **Modern UI**: Sleek and responsive design.
+- 📦 **Modular Architecture**: Easy to extend and maintain.
 
-## Build
+## Getting Started
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+Follow these instructions to get a copy of the project up and running on your local machine.
 
-## Running unit tests
+### Prerequisites
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+- Node.js
+- Angular CLI
 
-## Running end-to-end tests
+### Installation
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+1. Clone the repository:
+  ```bash
+  git clone https://github.com/Josepch1/charada.git
+  ```
+2. Navigate to the project directory:
+  ```bash
+  cd charada
+  ```
+3. Install the dependencies:
+  ```bash
+  npm install
+  ```
 
-## Further help
+### Running the Application
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+To start the development server, run:
+```bash
+ng serve
+```
+Open your browser and navigate to `http://localhost:4200`.
+
+## Building for Production
+
+To build the project for production, run:
+```bash
+ng build --prod
+```
+The build artifacts will be stored in the `dist/` directory.
+
+## Contributing
+
+We welcome contributions! Please read our [Contributing Guidelines](CONTRIBUTING.md) for more details.
+
+## License
+
+This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for details.
+
+## Acknowledgements
+
+- Thanks to the contributors and the open-source community. 🙏
+- Special thanks to [Angular](https://angular.io/) for their amazing framework.
+
+---
+
+Feel free to reach out if you have any questions or suggestions! 😊
